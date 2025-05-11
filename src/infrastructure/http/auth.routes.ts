@@ -4,6 +4,8 @@ import {
   createAccount,
 } from "./controllers/account.controller.js";
 import router from "./root.routes.js";
+import validation from "./middlewares/validation.middleware.js";
+import { logRequest } from "./middlewares/log.middleware.js";
 
 router.post(
   "/auth/create",
@@ -12,6 +14,8 @@ router.post(
   body("password")
     .isLength({ min: 8 })
     .withMessage("Required at least 8 characters"),
+  logRequest,
+  validation,
   createAccount
 );
 
@@ -21,6 +25,8 @@ router.post(
   body("password")
     .notEmpty()
     .withMessage("Required field"),
+  logRequest,
+  validation,
   authenticate
 );
 

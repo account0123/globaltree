@@ -10,13 +10,6 @@ import { UlidService } from "../../services/ulid.service.js";
 
 export async function createAccount(req: Request, res: Response) {
   try {
-    console.debug("Request to /auth/create", req.body);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({type: "ValidationError",data: errors.array({onlyFirstError: true})});
-      return;
-    }
-
     const { email, password, name, slug } = req.body;
     const existing = await AccountRepository.findByEmail(email);
     if (existing) {
@@ -40,13 +33,6 @@ export async function createAccount(req: Request, res: Response) {
 
 export async function authenticate(req: Request, res: Response) {
   try {
-    console.debug("Request to /auth/login", req.body);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({type: "ValidationError",data: errors.array({onlyFirstError: true})});
-      return;
-    }
-
     const { email, password } = req.body;
     const account = await AccountRepository.findByEmail(email);
     if (!account) {
