@@ -4,7 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun --watch index.js"
+    "dev": "bun --watch src/index.ts",
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -15,12 +17,21 @@
     "email": "ianparra.dev@proton.me"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.1",
+    "@types/slug": "^5.0.9",
+    "ts-node": "^10.9.2"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "bcrypt": "^5.1.1",
+    "colors": "^1.4.0",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "mongoose": "^8.14.1",
+    "slug": "^10.0.0",
+    "ulid": "^3.0.0"
   }
 }
