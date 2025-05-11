@@ -12,3 +12,12 @@ export async function connect() {
     process.exit(1);
   }
 }
+
+export async function disconnect() {
+  try {
+    await mongoose.disconnect();
+    console.log('✅ Disconnected from MongoDB');
+  } catch (error) {
+    console.error(colors.bgRed.bold('❌ Error disconnecting from MongoDB: %s'), error);
+  }
+}
