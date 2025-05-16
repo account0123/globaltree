@@ -9,10 +9,10 @@ const allowedOrigins: string[] = [];
 
 const corsOptions: CorsOptions = {
   origin(requestOrigin, callback) {
-    if (requestOrigin && (allowedOrigins.includes(requestOrigin) || requestOrigin.startsWith("http://localhost:"))) {
+    if (!requestOrigin || (allowedOrigins.includes(requestOrigin) || requestOrigin.startsWith("http://localhost:"))) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error(`Origin ${requestOrigin} not allowed by CORS`));
     }
   },
 }
