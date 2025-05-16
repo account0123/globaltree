@@ -7,6 +7,7 @@ import { BcryptEncryption } from "../../services/encryption.service.js";
 import { makeCreateUserUseCase } from "../../../application/create_user.use_case.js";
 import UserRepository from "../../db/mongoose/user.repository.js";
 import { UlidService } from "../../services/ulid.service.js";
+import { AccountDTO } from "../../../domain/account.dto.js";
 
 export async function createAccount(req: Request, res: Response) {
   try {
@@ -17,10 +18,12 @@ export async function createAccount(req: Request, res: Response) {
       return;
     }
     const hashedPassword = await BcryptEncryption.hash(password);
-    const user = await makeCreateUserUseCase(UserRepository)({ _id: UlidService.generate(), name, slug });
+    const createUser = makeCreateUserUseCase(UserRepository);
+    const user = await createUser({ _id: UlidService.generate(), name, slug });
     
     const account = await AccountRepository.save({ email, password: hashedPassword, name, user_id: user._id });
-    res.status(201).send(account);
+    const response = new AccountDTO(account);
+    res.status(201).send(response);
   } catch (error) {
     console.error(error);
     if (error instanceof MongooseError) {
