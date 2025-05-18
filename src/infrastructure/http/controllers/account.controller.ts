@@ -8,6 +8,7 @@ import { makeCreateUserUseCase } from "../../../application/create_user.use_case
 import UserRepository from "../../db/mongoose/user.repository.js";
 import { UlidService } from "../../services/ulid.service.js";
 import { AccountDTO } from "../../../domain/account.dto.js";
+import { JWTService } from "../../security/jwt.config.js";
 
 export async function createAccount(req: Request, res: Response) {
   try {
@@ -47,9 +48,10 @@ export async function authenticate(req: Request, res: Response) {
       res.status(401).send({type: "InvalidCredentials", message: "Invalid credentials"});
       return;
     }
-    const user = await UserRepository.findById(account.user_id);
-    res.status(200).send(user);
+    const token = JWTService.generate({ user_id: account.user_id });
+    res.status(200).send({session: { token }});
   } catch (error) {
+    console.error(error);
     if (error instanceof MongooseError) {
       res.status(400).send({type: "DatabaseError", message: error.message});
     } else {
