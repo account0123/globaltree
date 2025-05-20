@@ -20,6 +20,27 @@ export async function editUser(req: Request, res: Response) {
   }
 
   const body = req.body;
+  let { slug, name } = body;
+
+  if (slug === null) {
+    res.status(400).send({ type: "BadRequest", message: "Slug cannot be null" });
+    return;
+  }
+
+  if (name === null) {
+    res.status(400).send({ type: "BadRequest", message: "Name cannot be null" });
+    return;
+  }
+
+  if (slug) {
+    slug = SlugService.generate(slug, "_");
+  }
+
+  const existing = await UserRepository.findBySlug(slug);
+  if (existing && (existing._id != user._id)) {
+    res.status(409).send({ type: "SlugTaken", message: "Slug already taken", slug });
+    return;
+  }
 
   // body.x === undefined -> x is not updated
   // body.x === null -> x is updated to null
@@ -27,8 +48,8 @@ export async function editUser(req: Request, res: Response) {
   const data: DataEditUser = {
     avatar: body.avatar,
     description: body.description,
-    name: body.name,
-    slug: body.slug,
+    name: name,
+    slug: slug,
   };
 
   const updatedUser = await UserRepository.update(user._id, data);
