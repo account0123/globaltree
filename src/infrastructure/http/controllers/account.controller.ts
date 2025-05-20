@@ -48,7 +48,7 @@ export async function authenticate(req: Request, res: Response) {
       res.status(401).send({type: "InvalidCredentials", message: "Invalid credentials"});
       return;
     }
-    const token = JWTService.generate({ user_id: account.user_id });
+    const token = JWTService.generate({ user_id: account.user_id }, { expiresIn: "7d" });
     res.status(200).send({session: { token }});
   } catch (error) {
     console.error(error);
