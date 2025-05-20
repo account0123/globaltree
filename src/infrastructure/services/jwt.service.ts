@@ -1,5 +1,6 @@
 import {
   Algorithm,
+  JwtPayload,
   PrivateKey,
   PublicKey,
   Secret,
@@ -81,7 +82,7 @@ export class JwtPublicKeyService {
     });
   }
 
-  verify(token: string, options?: VerifyOptions) {
-    return verify(token, this.publicKey, options);
+  verify(token: string, options?: VerifyOptions): JwtPayload | string {
+    return verify(token, this.publicKey, {complete: false, ...options});
   }
 }
