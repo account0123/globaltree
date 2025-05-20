@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { Account } from "../../../domain/account.entity.js";
 
 const accountSchema = new Schema({
   email: { type: String, required: true, trim: true, unique: true, lowercase: true },
@@ -8,4 +9,4 @@ const accountSchema = new Schema({
   created_at: { type: Date, default: Date.now },
 });
 
-export default model("Account", accountSchema);
+export default model<Account>("Account", accountSchema);
