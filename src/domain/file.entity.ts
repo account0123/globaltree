@@ -1,5 +1,5 @@
 export interface File {
-  id: string;
+  _id: string;
   tag: string;
   url: string;
   metadata:
@@ -14,13 +14,13 @@ export interface File {
 }
 
 export class FileDTO {
-  id: string;
+  _id: string;
   tag: string;
   url: string;
   metadata: File["metadata"];
 
   constructor(file: File) {
-    this.id = file.id;
+    this._id = file._id;
     this.tag = file.tag;
     this.url = file.url;
     this.metadata = file.metadata;

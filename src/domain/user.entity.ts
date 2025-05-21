@@ -8,4 +8,4 @@ export interface User {
   description: string | null;
 }
 
-export type DataEditUser = Partial<Omit<User, "_id" | "avatar">>;
+export type DataEditUser = Partial<Omit<User, "_id">>;

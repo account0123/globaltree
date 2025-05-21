@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { DataEditUser, User } from "../../../domain/user.entity.js";
 import UserRepository from "../../db/mongoose/user.repository.js";
 import { SlugService } from "../../services/slug.service.js";
+import { CDNService } from "../../services/cloudinary.service.js";
+import FileRepository from "../../db/mongoose/file.repository.js";
 
 export async function createUser(data: User) {
   const slug = SlugService.generate(data.slug || data.name, "_");
@@ -65,4 +67,19 @@ export async function getSelfUser(req: Request, res: Response) {
 
   res.send(user);
   
+}
+
+export async function setSelfUserAvatar(req: Request, res: Response) {
+  const user = req.user!;
+  try {
+      const result = await CDNService.uploadOne(req, "avatars");
+      await UserRepository.update(user._id, { avatar: result });
+      res.send(result);
+  } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+          res.status(400).send({ type: "BadRequest", message: error.message });
+      }
+      res.status(500).send({ type: "UnhandledError", message: "Something went wrong" });
+  }
 }
