@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { MongooseError } from "mongoose";
-import { validationResult } from "express-validator";
 
 import AccountRepository from "../../db/mongoose/account.repository.js";
-import { BcryptEncryption } from "../../services/encryption.service.js";
+import { BcryptEncryption } from "../../services/bcrypt.service.js";
 import { makeCreateUserUseCase } from "../../../application/create_user.use_case.js";
 import UserRepository from "../../db/mongoose/user.repository.js";
 import { UlidService } from "../../services/ulid.service.js";
