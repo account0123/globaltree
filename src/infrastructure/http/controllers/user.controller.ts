@@ -46,7 +46,6 @@ export async function editUser(req: Request, res: Response) {
   // body.x === null -> x is updated to null
   // body.x === "" -> x is updated to ""
   const data: DataEditUser = {
-    avatar: body.avatar,
     description: body.description,
     name: name,
     slug: slug,
