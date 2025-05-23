@@ -4,6 +4,7 @@ import UserRepository from "../../db/mongoose/user.repository.js";
 import { SlugService } from "../../services/slug.service.js";
 import { CDNService } from "../../services/cloudinary.service.js";
 import FileRepository from "../../db/mongoose/file.repository.js";
+import { MongooseError } from "mongoose";
 
 export async function createUser(data: User) {
   const slug = SlugService.generate(data.slug || data.name, "_");
@@ -22,7 +23,7 @@ export async function editUser(req: Request, res: Response) {
   }
 
   const body = req.body;
-  let { slug, name } = body;
+  let { slug, name, links } = body;
 
   if (slug === null) {
     res.status(400).send({ type: "BadRequest", message: "Slug cannot be null" });
@@ -34,9 +35,15 @@ export async function editUser(req: Request, res: Response) {
     return;
   }
 
+  if (typeof links == "object" && !Array.isArray(links)) {
+    res.status(400).send({ type: "BadRequest", message: "Links must be a Link array" });
+    return;
+  }
+
   if (slug) {
     slug = SlugService.generate(slug, "_");
   }
+
 
   const existing = await UserRepository.findBySlug(slug);
   if (existing && (existing._id != user._id)) {
@@ -51,10 +58,24 @@ export async function editUser(req: Request, res: Response) {
     description: body.description,
     name: name,
     slug: slug,
+    links: body.links,
   };
 
-  const updatedUser = await UserRepository.update(user._id, data);
-  res.send(updatedUser);
+  try {
+    const updatedUser = await UserRepository.update(user._id, data);
+    res.send(updatedUser);
+  } catch (error) {
+    if (error instanceof MongooseError) {
+      res.status(400).send({ type: "DatabaseError", message: error.message });
+      return;
+    } else if (error instanceof Error) {
+      res.status(400).send({ type: "BadRequest", message: error.message });
+      return;
+    }
+    console.error(error);
+    res.status(500).send({ type: "UnhandledError", message: "Something went wrong" });
+  }
+  
 }
 
 export async function getSelfUser(req: Request, res: Response) {
