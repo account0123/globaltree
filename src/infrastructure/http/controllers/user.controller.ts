@@ -74,7 +74,7 @@ export async function setSelfUserAvatar(req: Request, res: Response) {
   try {
       const result = await CDNService.uploadOne(req, "avatars");
       await UserRepository.update(user._id, { avatar: result });
-      res.send(result);
+      res.status(204).send();
   } catch (error) {
       console.error(error);
       if (error instanceof Error) {
