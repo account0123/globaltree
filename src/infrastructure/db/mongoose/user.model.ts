@@ -3,6 +3,7 @@ import { User } from "../../../domain/user.entity.js";
 import { fileSchema } from "./file.model.js";
 
 const linkSchema = new Schema({
+  id: { type: Number, required: true},
   name: { type: String, required: true, trim: true},
   url: { type: String, required: true, trim: true},
   enabled: { type: Boolean, default: false},
