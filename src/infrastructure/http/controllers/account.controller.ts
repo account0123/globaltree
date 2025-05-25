@@ -19,7 +19,7 @@ export async function createAccount(req: Request, res: Response) {
     }
     const hashedPassword = await BcryptEncryption.hash(password);
     const createUser = makeCreateUserUseCase(UserRepository);
-    const user = await createUser({ _id: UlidService.generate(), avatar: null, description: null, name, slug });
+    const user = await createUser({ _id: UlidService.generate(), avatar: null, description: null, name, slug, links: null });
     
     const account = await AccountRepository.save({ email, password: hashedPassword, name, user_id: user._id });
     const response = new AccountDTO(account);
