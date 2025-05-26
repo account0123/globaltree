@@ -3,12 +3,11 @@ import { DataEditUser, User } from "../../../domain/user.entity.js";
 import UserRepository from "../../db/mongoose/user.repository.js";
 import { SlugService } from "../../services/slug.service.js";
 import { CDNService } from "../../services/cloudinary.service.js";
-import FileRepository from "../../db/mongoose/file.repository.js";
 import { MongooseError } from "mongoose";
 
 export async function createUser(data: User) {
   const slug = SlugService.generate(data.slug || data.name, "_");
-  if (!await UserRepository.findBySlug(slug)) {
+  if (!(await UserRepository.findBySlug(slug))) {
     data.slug = slug;
   }
   const user = await UserRepository.save(data);
@@ -26,17 +25,23 @@ export async function editUser(req: Request, res: Response) {
   let { slug, name, links } = body;
 
   if (slug === null) {
-    res.status(400).send({ type: "BadRequest", message: "Slug cannot be null" });
+    res
+      .status(400)
+      .send({ type: "BadRequest", message: "Slug cannot be null" });
     return;
   }
 
   if (name === null) {
-    res.status(400).send({ type: "BadRequest", message: "Name cannot be null" });
+    res
+      .status(400)
+      .send({ type: "BadRequest", message: "Name cannot be null" });
     return;
   }
 
   if (typeof links == "object" && !Array.isArray(links)) {
-    res.status(400).send({ type: "BadRequest", message: "Links must be a Link array" });
+    res
+      .status(400)
+      .send({ type: "BadRequest", message: "Links must be a Link array" });
     return;
   }
 
@@ -44,10 +49,11 @@ export async function editUser(req: Request, res: Response) {
     slug = SlugService.generate(slug, "_");
   }
 
-
   const existing = await UserRepository.findBySlug(slug);
-  if (existing && (existing._id != user._id)) {
-    res.status(409).send({ type: "SlugTaken", message: "Slug already taken", slug });
+  if (existing && existing._id != user._id) {
+    res
+      .status(409)
+      .send({ type: "SlugTaken", message: "Slug already taken", slug });
     return;
   }
 
@@ -73,9 +79,32 @@ export async function editUser(req: Request, res: Response) {
       return;
     }
     console.error(error);
+    res
+      .status(500)
+      .send({ type: "UnhandledError", message: "Something went wrong" });
+  }
+}
+
+export async function getUserBySlug(req: Request, res: Response) {
+  try {
+    const { slug } = req.params;
+    if (!slug) {
+      res.status(400).send({ type: "BadRequest", message: "slug is required in /users/{slug}" });
+      return;
+    }
+    const user = await UserRepository.findBySlug(slug);
+    if (!user) {
+      res.status(404).send({ type: "UnknownUser", message: "User not found", slug });
+      return;
+    }
+    res.status(200).send(user);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      res.status(400).send({ type: "BadRequest", message: error.message });
+    }
     res.status(500).send({ type: "UnhandledError", message: "Something went wrong" });
   }
-  
 }
 
 export async function getSelfUser(req: Request, res: Response) {
@@ -87,20 +116,21 @@ export async function getSelfUser(req: Request, res: Response) {
   }
 
   res.send(user);
-  
 }
 
 export async function setSelfUserAvatar(req: Request, res: Response) {
   const user = req.user!;
   try {
-      const result = await CDNService.uploadOne(req, "avatars");
-      await UserRepository.update(user._id, { avatar: result });
-      res.status(204).send();
+    const result = await CDNService.uploadOne(req, "avatars");
+    await UserRepository.update(user._id, { avatar: result });
+    res.status(204).send();
   } catch (error) {
-      console.error(error);
-      if (error instanceof Error) {
-          res.status(400).send({ type: "BadRequest", message: error.message });
-      }
-      res.status(500).send({ type: "UnhandledError", message: "Something went wrong" });
+    console.error(error);
+    if (error instanceof Error) {
+      res.status(400).send({ type: "BadRequest", message: error.message });
+    }
+    res
+      .status(500)
+      .send({ type: "UnhandledError", message: "Something went wrong" });
   }
 }

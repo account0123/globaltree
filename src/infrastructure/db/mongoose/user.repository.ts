@@ -12,10 +12,10 @@ export default class {
   }
 
   static async findById(id: string) {
-    return UserModel.findOne({ _id: id });
+    return UserModel.findOne({ _id: id }).select("-__v");
   }
 
   static async findBySlug(slug: string) {
-    return UserModel.findOne({ slug });
+    return UserModel.findOne({ slug }).select("-__v");
   }
 }
