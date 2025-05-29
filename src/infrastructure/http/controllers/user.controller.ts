@@ -107,6 +107,23 @@ export async function getUserBySlug(req: Request, res: Response) {
   }
 }
 
+export async function getUserAvailability(req: Request, res: Response) {
+  const { slug } = req.body;
+  try {
+    const existing = await UserRepository.findBySlug(slug);
+    if (existing) {
+      res.status(409).send({ type: "SlugTaken", message: "Slug already taken", slug });
+      return;
+    }
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      res.status(400).send({ type: "BadRequest", message: error.message });
+    }
+  }
+}
+
 export async function getSelfUser(req: Request, res: Response) {
   const user = req.user;
 
