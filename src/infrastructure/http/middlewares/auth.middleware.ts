@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { JWTService } from "../../security/jwt.config.js";
-import { JsonWebTokenError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import UserRepository from "../../db/mongoose/user.repository.js";
 
 export async function authorization(
@@ -20,7 +20,7 @@ export async function authorization(
   try {
     const result = JWTService.verify(token);
     if (typeof result == "string" || !result.user_id) {
-      throw new JsonWebTokenError("Invalid token");
+      throw new jwt.JsonWebTokenError("Invalid token");
     }
 
     const user = await UserRepository.findById(result.user_id);
@@ -32,7 +32,7 @@ export async function authorization(
     next();
   } catch (error) {
     console.error(error);
-    if (error instanceof JsonWebTokenError) {
+    if (error instanceof jwt.JsonWebTokenError) {
       res.status(401).send({ type: "Unauthorized", message: error.message });
       return;
     }

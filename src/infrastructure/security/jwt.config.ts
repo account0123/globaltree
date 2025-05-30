@@ -1,14 +1,16 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { JwtPublicKeyService } from "../services/jwt.service.js";
-import { join } from "path";
+import { join, dirname } from "path";
 import { generateKeyPairSync } from "crypto";
+import { fileURLToPath } from "url";
 
 function createKeyPair() {
   return generateKeyPairSync("rsa", {
     modulusLength: 2048,
   });
 }
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const publicKeyPath = join(__dirname, "public.pem");
 const privateKeyPath = join(__dirname, "private.pem");
 let privateKey: string | Buffer = "";

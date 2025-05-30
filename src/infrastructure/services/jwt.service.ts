@@ -1,12 +1,10 @@
-import {
+import jwt, {
   Algorithm,
   JwtPayload,
   PrivateKey,
   PublicKey,
   Secret,
-  sign,
   SignOptions,
-  verify,
   VerifyOptions,
 } from "jsonwebtoken";
 
@@ -33,14 +31,14 @@ export class JwtSecretService {
         `Algorithm mismatch: options.algorithm=${options.algorithm} vs this.algorithm=${this.algorithm}. Using ${options.algorithm}`
       );
     }
-    return sign(payload, this.secret, {
+    return jwt.sign(payload, this.secret, {
       algorithm: this.algorithm,
       ...options,
     });
   }
 
   verify(token: string, options?: VerifyOptions) {
-    return verify(token, this.secret, options);
+    return jwt.verify(token, this.secret, options);
   }
 }
 
@@ -76,13 +74,13 @@ export class JwtPublicKeyService {
       );
     }
 
-    return sign(payload, this.privateKey, {
+    return jwt.sign(payload, this.privateKey, {
       algorithm: this.algorithm,
       ...options,
     });
   }
 
   verify(token: string, options?: VerifyOptions): JwtPayload | string {
-    return verify(token, this.publicKey, {complete: false, ...options});
+    return jwt.verify(token, this.publicKey, {complete: false, ...options});
   }
 }
