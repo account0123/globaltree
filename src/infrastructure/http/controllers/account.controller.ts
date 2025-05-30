@@ -17,6 +17,11 @@ export async function createAccount(req: Request, res: Response) {
       res.status(409).json({type: "EmailConflict", message: "Email already exists"});
       return;
     }
+    const existingUser = await UserRepository.findBySlug(slug);
+    if (existingUser) {
+      res.status(409).json({type: "UsernameTaken", message: "Username already exists"});
+      return;
+    }
     const hashedPassword = await BcryptEncryption.hash(password);
     const createUser = makeCreateUserUseCase(UserRepository);
     const user = await createUser({ _id: UlidService.generate(), avatar: null, description: null, name, slug, links: null });
